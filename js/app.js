@@ -8,7 +8,7 @@ var app = {
     SELECT: 3
   },
   canvasMode: null,
-  selectedLine: null,
+  selectedLineIndex: null,
 
   init: function() {
     var self = this;
@@ -24,13 +24,26 @@ var app = {
     var self = this;
     document.getElementById('btn-line').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.DRAW;
+
+      // un-select any selected line
+      if (self.selectedLineIndex > -1){
+        self.selectedLineIndex = -1;
+        self.render();
+      }
+
       self.pos = null;
       self.updateToolbarState();
     });
     document.getElementById('btn-erase').addEventListener('click', function() {
-      self.canvasMode = self.modeEnum.ERASE;
+      if (self.canvasMode === self.modeEnum.SELECT) {
+        self.lines.splice(self.selectedLineIndex, 1);
+        self.selectedLineIndex = -1;
+        self.render();
+      } else {
+        self.canvasMode = self.modeEnum.ERASE;
+        self.updateToolbarState();
+      }
       self.pos = null;
-      self.updateToolbarState();
     });
     document.getElementById('btn-select').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.SELECT;
@@ -77,24 +90,9 @@ var app = {
     });
   },
 
-  selectLine: function(x,y) {
+  findClosestIndex: function(x,y) {
     self = this;
     if (self.lines.length > 0) { // if there's something to select
-
-    // var minSquareDistance, closestIndex;
-    // self.lines.forEach(function(line, index) {
-    //   var squareDistance = line.squareDistanceFrom(x, y);
-    //   if(index === 0 || squareDistance < minSquareDistance) {
-    //     minSquareDistance = squareDistance;
-    //     closestIndex = index;
-    //   }
-    //
-     }
-  },
-
-  eraseLine: function(x,y) {
-    self = this;
-    if (self.lines.length > 0) {
       var minSquareDistance, closestIndex;
       self.lines.forEach(function(line, index) {
         var squareDistance = line.squareDistanceFrom(x, y);
@@ -103,6 +101,26 @@ var app = {
           closestIndex = index;
         }
       });
+      return closestIndex;
+    }
+    return -1;
+  },
+
+  selectLine: function(x,y) {
+    self = this;
+    let closestIndex = self.findClosestIndex(x, y);
+    let line = self.lines[closestIndex];
+    if (line && line.squareDistanceFrom(x,y) <= 100) {// only want lines within 10 pixels
+      self.selectedLineIndex = closestIndex;
+    } else {
+      self.selectedLineIndex = -1;
+    }
+  },
+
+  eraseLine: function(x,y) {
+    self = this;
+    let closestIndex = self.findClosestIndex(x, y);
+    if (closestIndex > -1) {
       self.lines.splice(closestIndex, 1);
     }
   },
@@ -129,8 +147,11 @@ var app = {
     if (canvas) {
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      self.lines.forEach(function(line) {
+      self.lines.forEach(function(line, index) {
         line.draw(ctx);
+        if (index === self.selectedLineIndex) {
+          line.drawEnds(ctx);
+        }
       });
     }
   },
