@@ -8,6 +8,7 @@ var app = {
     SELECT: 3
   },
   canvasMode: null,
+  selectedLine: null,
 
   init: function() {
     var self = this;
@@ -70,12 +71,25 @@ var app = {
       } else if (self.isDrawMode()) {
           self.drawLine(x,y);
       } else if (self.isSelectMode()) {
-          if (self.lines.length > 0) { // if there's something to select
-
-          }
+          self.selectLine(x,y);
       }
       self.render();
     });
+  },
+
+  selectLine: function(x,y) {
+    self = this;
+    if (self.lines.length > 0) { // if there's something to select
+
+    // var minSquareDistance, closestIndex;
+    // self.lines.forEach(function(line, index) {
+    //   var squareDistance = line.squareDistanceFrom(x, y);
+    //   if(index === 0 || squareDistance < minSquareDistance) {
+    //     minSquareDistance = squareDistance;
+    //     closestIndex = index;
+    //   }
+    //
+     }
   },
 
   eraseLine: function(x,y) {
@@ -98,10 +112,11 @@ var app = {
     if(!self.pos) {
       // save first click of the line
       self.pos = [ x, y ];
-    } else if(self.canvasMode === self.modeEnum.DRAW){
+    } else {
       // create the line and add to the list
       var x0 = self.pos[0], y0 = self.pos[1];
-      var length = Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
+      var length = Geometry.distance(x0, y0, x, y);
+      // Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
       var line = new Line(x0, y0, x, y, length);
       self.lines.push(line);
       self.pos = null;

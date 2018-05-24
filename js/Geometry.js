@@ -7,7 +7,7 @@ var Geometry = {
   distance: function(x1, y1, x2, y2) {
     return Math.sqrt(this.squareDistance(x1, y1, x2, y2));
   },
-  
+
   /**
    * Returns the square of the distance between 2 points
    * x1/y1: position of 1st point
@@ -16,7 +16,7 @@ var Geometry = {
   squareDistance: function(x1, y1, x2, y2) {
     return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
   },
-  
+
   /**
    * Returns the distance between from a point P to a line segment
    * x,y: position of P
@@ -25,19 +25,19 @@ var Geometry = {
   distanceToSegment: function(x, y, x1, y1, x2, y2) {
     return Math.sqrt(this.squareDistanceToSegment(x, y, x1, y1, x2, y2));
   },
-  
+
   /**
    * Returns the square of the distance from a point P to a line segment
    * x,y: position of P
    * x1,y1 / x2,y2: position of segment ends
    */
   squareDistanceToSegment: function(x, y, x1, y1, x2, y2) {
-    var length2 = this.squareDistance(x1, y1, x2, y2);
-    if(length2 == 0)
+    var segmentLength = this.squareDistance(x1, y1, x2, y2);
+    if(segmentLength == 0)
       return this.squareDistance(x, y, x1 , y1);
-    
+
     // consider the line as parameterized function, find projection param
-    var t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / length2;
+    var t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / segmentLength;
     // clamp to segment
     if(t < 0)
       t = 0;
