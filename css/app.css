@@ -1,0 +1,42 @@
+body {
+  background: #eee;
+}
+.app {
+  width: 800px;
+  margin: 20px auto;
+  font-family: Arial;
+  border: 5px solid #ddd;
+  box-shadow: 5px 5px 20px #ccc;
+  background: #fff;
+}
+.toolbar {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  background: #ddd;
+  padding: 0 10px;
+}
+.toolbar > * {
+  margin-right: 2px;
+}
+.toolbar > *:last-child {
+  margin-right: 0;
+}
+.toolbar button {
+  width: 40px;
+  padding: 5px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  outline: none;
+}
+.toolbar button:hover {
+  background-color: #fff;
+}
+.toolbar button.active {
+  background-color: #fff;
+  cursor: default;
+}
+.toolbar button img {
+  height: 20px;
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Take-home assignment #2</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background: #eee;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+    }
+
+    div.container {
+      width: 100%;
+      max-width: 800px;
+      padding: 10px 20px;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    code {
+      background: #eee;
+      font-size: 12px;
+      padding: 1px 2px;
+      text-shadow: 1px 1px 0 #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 id="take-home-assignment-2">Take-home assignment #2</h1>
+    <p>In this assignment, you will be working on an existing canvas-based drawing application.</p>
+    <p>In its current state, the application supports a toolbar, with 2 modes:</p>
+    <ul>
+      <li><em>Line</em>: the user can draw a line by clicking at 2 positions on the canvas,</li>
+      <li><em>Erase</em>: the user can erase a line by clicking within 10 pixels of it.</li>
+    </ul>
+    <p>We have 3 new requirements for this drawing application. You should read all the requirements first, but we recommend you to work on them in order.</p>
+    <p>General guidelines:</p>
+    <ul>
+      <li>You may not use any external JS libraries.</li>
+      <li>You may fix any issue that you would point out during code review and ask another developer to fix. This includes general best practices, poor design patterns, etc.
+        <ul>
+          <li>We are not expecting a complete refactoring, so for example, you should not have to rewrite everything in ES6.</li>
+          <li>You do not need to change app.css/index.html besides adding more scripts to load and commenting/uncommenting html for buttons in the toolbar.</li>
+        </ul>
+      </li>
+      <li>Browser support
+        <ul>
+          <li>You just need to support Google Chrome here. If you do not have access to Chrome, please mention which browser you tested your code on.</li>
+          <li>There is no expectation to support touch devices.</li>
+        </ul>
+      </li>
+    </ul>
+    <h2 id="new-requirements">New requirements</h2>
+    <h3 id="1-make-deletion-more-deterministic">1. Make deletion more deterministic</h3>
+    <p>As is, the <em>Erase</em> mode can make it hard for the user to pick the right line, because if several lines are within 10 pixels of the clicking point, then it is easy to delete the wrong line.</p>
+    <p>To solve this, we want to revamp how deletion works.</p>
+    <p>Requirements:</p>
+    <ul>
+      <li>Add a new <em>Select</em> button to the toolbar
+        <ul>
+          <li>When a line is selected, its ends should show as small circles to provide feedback on the which line is selected.</li>
+          <li>If several lines are within 10 pixels of the clicking point, the closest line should be selected.</li>
+          <li>If no line is within 10 pixels of the clicking point, no line should be selected, and any currently selected line should be de-selected.</li>
+        </ul>
+      </li>
+      <li>Clicking on the <em>Erase</em> button should simply delete the currently selected line and leave the user in <em>Select</em> mode with no line selected.</li>
+    </ul>
+    <h3 id="2-add-new-pencil-mode">2. Add new <em>Pencil</em> mode</h3>
+    <p>To provide a second option to draw, we want to add a new <em>Pencil</em> mode.</p>
+    <p>Requirements:</p>
+    <ul>
+      <li>Add a new <em>Pencil</em> button to the toolbar.</li>
+      <li>In this mode, the user can draw by holding down the left button of their mouse and moving it over the canvas. When the mouse button is released or the mouse leaves the canvas, drawing should stop.</li>
+      <li>The drawn object is a series of connected lines to approximate the path of the mouse, with a new segment being added on every mousemove event.</li>
+      <li>In <em>Select</em> mode, the full object becomes selected and can be deleted.</li>
+    </ul>
+    <h3 id="3-support-moving-lines">3. Support moving lines</h3>
+    <p>Lastly, users have asked to be able to move existing objects.</p>
+    <p>Requirements:</p>
+    <ul>
+      <li>Add a new <em>Move</em> button to the toolbar.</li>
+      <li>In this mode, the closest object within 10 pixels should become selected when you mouse down to start dragging it.</li>
+      <li>Only the whole object can be moved, not points or segments from the <em>Pencil</em> mode.</li>
+      <li>No part of any line can leave the canvas while moving. This constraint should be implemented in a user-friendly way, including when the mouse leaves the canvas.</li>
+    </ul>
+  </div>
+</body>
+
+</html>

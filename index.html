@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Collage.com Take-Home Assignment</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <button id="btn-line" title="Draw line" class="active">
+        <img src="svg/line.svg">
+      </button>
+      <button id="btn-erase" title="Erase">
+        <img src="svg/select-erase.svg">
+        <!-- <img src="svg/select-erase.svg"> -->
+      </button>
+      <!--
+      <button id="btn-select" title="Select">
+        <img src="svg/select.svg">
+      </button>
+      <button id="btn-pencil" title="Pencil">
+        <img src="svg/pencil.svg">
+      </button>
+      <button id="btn-move" title="Move">
+        <img src="svg/move.svg">
+      </button>
+      -->
+    </div>
+    <canvas id="canvas" width="800" height="600"></canvas>
+  </div>
+  <script src="js/Geometry.js"></script>
+  <script src="js/Line.js"></script>
+  <script src="js/app.js"></script>
+  <script>app.init();</script>
+</body>
+</html>
