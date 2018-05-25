@@ -26,11 +26,7 @@ var app = {
     var self = this;
     document.getElementById('btn-line').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.DRAW;
-      // un-select any selected line
-      if (self.selectedLineIndex > -1){
-        self.selectedLineIndex = -1;
-        self.render();
-      }
+      self.unSelectLines();
       self.pos = null;
       self.updateToolbarState();
     });
@@ -53,13 +49,22 @@ var app = {
     document.getElementById('btn-pencil').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.PENCIL;
       self.pos = null;
+      self.unSelectLines();
       self.updateToolbarState();
     });
     document.getElementById('btn-move').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.MOVE;
+      self.unSelectLines();
       self.pos = null;
       self.updateToolbarState();
     });
+  },
+
+  unSelectLines: () => {
+    if (self.selectedLineIndex > -1){
+      self.selectedLineIndex = -1;
+      self.render();
+    }
   },
 
   isEraseMode: function() {
@@ -136,6 +141,33 @@ var app = {
           };
 
           canvas.addEventListener('mouseup', mouseUpHandler);
+      } else if (self.isMoveMode() && e.which === 1){
+
+          self.pos = [ e.offsetX, e.offsetY ];
+          self.selectLine(e.offsetX, e.offsetY);
+          if (self.selectedLineIndex > -1){
+
+            const mouseMoveHandler = (evt) => {
+
+              let moveX = evt.offsetX - e.offsetX;
+              let moveY = evt.offsetY - e.offsetY;
+              let selectedLines = self.lines[self.selectedLineIndex];
+              selectedLines.map(line => line.move(moveX, moveY))
+              self.render();
+
+              self.pos = [ evt.offsetX, evt.offsetY ];
+            };
+            canvas.addEventListener('mousemove', mouseMoveHandler);
+            const mouseUpHandler = (evt) => {
+              self.pos = null;
+              canvas.removeEventListener('mousemove', mouseMoveHandler);
+              canvas.removeEventListener('mouseup', mouseUpHandler);
+            };
+
+            canvas.addEventListener('mouseup', mouseUpHandler);
+
+          }
+
       }
     });
   },
@@ -146,7 +178,7 @@ var app = {
       var minSquareDistance, closestIndex;
       self.lines.forEach((objectLines, index) => {
         objectLines.forEach((line) => {
-          var squareDistance = line.squareDistanceFrom(x, y);
+          let squareDistance = line.squareDistanceFrom(x, y);
           if((minSquareDistance === undefined) || (squareDistance < minSquareDistance)) {
             minSquareDistance = squareDistance;
             closestIndex = index;
