@@ -13,7 +13,6 @@ var app = {
   selectedLineIndex: null,
 
   init: function () {
-  //  var self = this;
     if(this.initDone)
       return;
     this.canvasMode = this.modeEnum.DRAW;
@@ -23,7 +22,7 @@ var app = {
   },
 
   bindToolbarEvents: function () {
-  //  var self = this;
+
     document.getElementById('btn-line').addEventListener('click', () => {
       this.canvasMode = this.modeEnum.DRAW;
       this.unSelectLines();
@@ -68,28 +67,22 @@ var app = {
   },
 
   isEraseMode: function () {
-  //  var self = this;
     return this.canvasMode === this.modeEnum.ERASE;
   },
   isDrawMode: function () {
-  //  var self = this;
     return this.canvasMode === this.modeEnum.DRAW;
   },
   isSelectMode: function () {
-  //  var self = this;
     return this.canvasMode === this.modeEnum.SELECT;
   },
   isPencilMode: function () {
-  //  var self = this;
     return this.canvasMode === this.modeEnum.PENCIL;
   },
   isMoveMode: function () {
-  //  var self = this;
     return this.canvasMode === this.modeEnum.MOVE;
   },
 
   updateToolbarState: function () {
-  //  var self = this;
     document.getElementById('btn-erase').className = this.isEraseMode() ? 'active' : '';
     document.getElementById('btn-line').className = this.isDrawMode() ? 'active' : '';
     document.getElementById('btn-select').className = this.isSelectMode() ? 'active' : '';
@@ -98,7 +91,6 @@ var app = {
   },
 
   bindDrawAreaEvents: function () {
-  //  var self = this;
     var canvas = document.getElementById('canvas');
     canvas.addEventListener('click', (e) => {
       var x = e.offsetX, y = e.offsetY;
@@ -124,8 +116,7 @@ var app = {
           const mouseMoveHandler = (evt) => {
 
             let newX = evt.offsetX, newY = evt.offsetY;
-            let length = Geometry.distance(this.pos[0], this.pos[1], newX, newY);
-            let line = new Line(this.pos[0], this.pos[1], newX, newY, length);
+            let line = new Line(this.pos[0], this.pos[1], newX, newY);
 
             objectLines.push(line);
             this.render();
@@ -165,15 +156,13 @@ var app = {
             };
 
             canvas.addEventListener('mouseup', mouseUpHandler);
-
           }
-
       }
     });
   },
 
   findClosestIndex: function(x,y) {
-  //  self = this;
+
     if (this.lines.length > 0) { // if there's something to select
       var minSquareDistance, closestIndex;
       this.lines.forEach((objectLines, index) => {
@@ -191,7 +180,6 @@ var app = {
   },
 
   selectLine: function(x,y) {
-  //  self = this;
     let closestIndex = this.findClosestIndex(x, y);
     let line = this.lines[closestIndex];
     //if (line && line.squareDistanceFrom(x,y) <= 100) {// only want lines within 10 pixels
@@ -203,7 +191,6 @@ var app = {
   },
 
   eraseLine: function(x,y) {
-  //  self = this;
     let closestIndex = this.findClosestIndex(x, y);
     if (closestIndex > -1) {
       this.lines.splice(closestIndex, 1);
@@ -211,15 +198,13 @@ var app = {
   },
 
   drawLine: function(x,y) {
-  //  self = this;
     if(!this.pos) {
       // save first click of the line
       this.pos = [ x, y ];
     } else {
       // create the line and add to the list
       var x0 = this.pos[0], y0 = this.pos[1];
-      var length = Geometry.distance(x0, y0, x, y);
-      var line = new Line(x0, y0, x, y, length);
+      var line = new Line(x0, y0, x, y);
 
       let objectLine = [ line ];
       this.lines.push(objectLine);
@@ -228,7 +213,6 @@ var app = {
   },
 
   render: function() {
-  //  var self = this;
     var canvas = document.getElementById('canvas');
     if (canvas) {
       var ctx = canvas.getContext('2d');
