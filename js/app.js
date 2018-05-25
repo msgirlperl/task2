@@ -6,7 +6,8 @@ var app = {
     DRAW: 1,
     ERASE: 2,
     SELECT: 3,
-    PENCIL: 4
+    PENCIL: 4,
+    MOVE: 5
   },
   canvasMode: null,
   selectedLineIndex: null,
@@ -25,13 +26,11 @@ var app = {
     var self = this;
     document.getElementById('btn-line').addEventListener('click', function() {
       self.canvasMode = self.modeEnum.DRAW;
-
       // un-select any selected line
       if (self.selectedLineIndex > -1){
         self.selectedLineIndex = -1;
         self.render();
       }
-
       self.pos = null;
       self.updateToolbarState();
     });
@@ -56,26 +55,32 @@ var app = {
       self.pos = null;
       self.updateToolbarState();
     });
+    document.getElementById('btn-move').addEventListener('click', function() {
+      self.canvasMode = self.modeEnum.MOVE;
+      self.pos = null;
+      self.updateToolbarState();
+    });
   },
 
   isEraseMode: function() {
     var self = this;
     return self.canvasMode === self.modeEnum.ERASE ;
   },
-
   isDrawMode: function() {
     var self = this;
     return self.canvasMode === self.modeEnum.DRAW ;
   },
-
   isSelectMode: function() {
     var self = this;
     return self.canvasMode === self.modeEnum.SELECT ;
   },
-
   isPencilMode: function() {
     var self = this;
     return self.canvasMode === self.modeEnum.PENCIL ;
+  },
+  isMoveMode: function() {
+    var self = this;
+    return self.canvasMode === self.modeEnum.MOVE ;
   },
 
   updateToolbarState: function() {
@@ -84,6 +89,7 @@ var app = {
     document.getElementById('btn-line').className = self.isDrawMode() ? 'active' : '';
     document.getElementById('btn-select').className = self.isSelectMode() ? 'active' : '';
     document.getElementById('btn-pencil').className = self.isPencilMode() ? 'active' : '';
+    document.getElementById('btn-move').className = self.isMoveMode() ? 'active' : '';
   },
 
   bindDrawAreaEvents: function() {
@@ -112,9 +118,7 @@ var app = {
 
           const mouseMoveHandler = (evt) => {
 
-            let newX = evt.offsetX;
-            let newY = evt.offsetY;
-
+            let newX = evt.offsetX, newY = evt.offsetY;
             let length = Geometry.distance(self.pos[0], self.pos[1], newX, newY);
             let line = new Line(self.pos[0], self.pos[1], newX, newY, length);
 
@@ -141,14 +145,13 @@ var app = {
     if (self.lines.length > 0) { // if there's something to select
       var minSquareDistance, closestIndex;
       self.lines.forEach((objectLines, index) => {
-        objectLines.forEach((line, index2) => {
+        objectLines.forEach((line) => {
           var squareDistance = line.squareDistanceFrom(x, y);
-          if((minSquareDistance === undefined) || (index === 0) || (squareDistance < minSquareDistance)) {
+          if((minSquareDistance === undefined) || (squareDistance < minSquareDistance)) {
             minSquareDistance = squareDistance;
             closestIndex = index;
           }
         });
-
       });
       return closestIndex;
     }
@@ -192,19 +195,6 @@ var app = {
     }
   },
 
-  // drawObjectLine: function(x,y,newX,newY){
-  //   self = this;
-  //
-  //   // create the line and add to the list
-  //   var x0 = self.pos[0], y0 = self.pos[1];
-  //   var length = Geometry.distance(x0, y0, x, y);
-  //   // Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
-  //   var line = new Line(x0, y0, x, y, length);
-  //   self.lines.push(line);
-  //   self.pos = null;
-  // },
-
-
   render: function() {
     var self = this;
     var canvas = document.getElementById('canvas');
@@ -214,7 +204,7 @@ var app = {
       self.lines.forEach((objectLines, index) => {
         objectLines.forEach(line => {
           line.draw(ctx);
-          if (index === self.selectedLineIndex) { //TODO: do we want to check type?  if object, use fill instead or change color?
+          if (index === self.selectedLineIndex) {
             line.drawEnds(ctx);
           }
         });
