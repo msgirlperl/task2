@@ -1,4 +1,4 @@
-var app = {
+let app = {
   initDone: false,
   lines: [],
   pos: null,
@@ -91,9 +91,9 @@ var app = {
   },
 
   bindDrawAreaEvents: function () {
-    var canvas = document.getElementById('canvas');
+    let canvas = document.getElementById('canvas');
     canvas.addEventListener('click', (e) => {
-      var x = e.offsetX, y = e.offsetY;
+      let x = e.offsetX, y = e.offsetY;
       if (this.isEraseMode()) {
         this.eraseLine(x,y);
       } else if (this.isDrawMode()) {
@@ -140,16 +140,26 @@ var app = {
 
             const mouseMoveHandler = (evt) => {
 
-              let moveX = evt.offsetX - e.offsetX;
-              let moveY = evt.offsetY - e.offsetY;
+              let moveX = evt.offsetX - this.pos[0];
+              let moveY = evt.offsetY - this.pos[1];
               let selectedLines = this.lines[this.selectedLineIndex];
-              selectedLines.map(line => line.move(moveX, moveY))
-              this.render();
+              let canvas = document.getElementById('canvas');
+              if (selectedLines.some(line => line.checkDisallowMove(moveX, moveY, canvas))){ // verify we'll still be on the canvas
+                let warning = document.getElementById('warning');
+                warning.className = "visible";
 
-              this.pos = [ evt.offsetX, evt.offsetY ];
+                setTimeout(() =>  warning.className = "hidden", 3000);
+
+                mouseUpHandler(); // remove the move handlers b/c we're no longer on the canvas
+                //evt.stopPropagation();
+              } else {
+                selectedLines.map(line => line.move(moveX, moveY)); //TODO: need return?
+                this.render();
+                this.pos = [ evt.offsetX, evt.offsetY ];
+              }
             };
             canvas.addEventListener('mousemove', mouseMoveHandler);
-            const mouseUpHandler = (evt) => {
+            const mouseUpHandler = () => {
               this.pos = null;
               canvas.removeEventListener('mousemove', mouseMoveHandler);
               canvas.removeEventListener('mouseup', mouseUpHandler);
@@ -164,7 +174,7 @@ var app = {
   findClosestIndex: function(x,y) {
 
     if (this.lines.length > 0) { // if there's something to select
-      var minSquareDistance, closestIndex;
+      let minSquareDistance, closestIndex;
       this.lines.forEach((objectLines, index) => {
         objectLines.forEach((line) => {
           let squareDistance = line.squareDistanceFrom(x, y);
@@ -203,8 +213,8 @@ var app = {
       this.pos = [ x, y ];
     } else {
       // create the line and add to the list
-      var x0 = this.pos[0], y0 = this.pos[1];
-      var line = new Line(x0, y0, x, y);
+      let x0 = this.pos[0], y0 = this.pos[1];
+      let line = new Line(x0, y0, x, y);
 
       let objectLine = [ line ];
       this.lines.push(objectLine);
@@ -213,9 +223,9 @@ var app = {
   },
 
   render: function() {
-    var canvas = document.getElementById('canvas');
+    let canvas = document.getElementById('canvas');
     if (canvas) {
-      var ctx = canvas.getContext('2d');
+      let ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.lines.forEach((objectLines, index) => {
         objectLines.forEach(line => {

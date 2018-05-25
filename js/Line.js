@@ -3,7 +3,7 @@ var Line = function(x1, y1, x2, y2) {
   this.y1 = y1;
   this.x2 = x2;
   this.y2 = y2;
-  this.length = Geometry.distance(x1, y1, x2, y2); //TODO: is this right?  shouldn't it be distance?
+  this.length = Geometry.distance(x1, y1, x2, y2);
 };
 
 Line.prototype.draw = function(ctx) {
@@ -32,6 +32,22 @@ Line.prototype.move = function(dx, dy) {
   this.y1 += dy;
   this.x2 += dx;
   this.y2 += dy;
+};
+
+Line.prototype.checkDisallowMove = function(dx, dy, ctx) {
+
+  // const handleDisallowMove = () => {
+  //   alert('Sorry, you must keep your selection within the drawing area');
+  //   return true;
+  // };
+
+  if (((this.x1 + dx) < 0) || (this.x1 > ctx.width)) return true;
+  if (((this.x2 + dx) < 0) || (this.x2 > ctx.width)) return true;
+  if (((this.y1 + dy) < 0) || (this.y1 > ctx.height)) return true;
+  if (((this.y2 + dy) < 0) || (this.y2 > ctx.height)) return true;
+
+  return false;
+
 };
 
 Line.prototype.squareDistanceFrom = function(x, y) {

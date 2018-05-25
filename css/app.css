@@ -40,3 +40,15 @@ body {
 .toolbar button img {
   height: 20px;
 }
+#warning {
+  font-style:italic;
+  color:red;
+  font-size: 12px;
+  padding-left: 10px;
+}
+.hidden {
+  visibility: hidden;
+}
+.visible{
+  visibility: visible;
+}

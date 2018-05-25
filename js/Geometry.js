@@ -32,20 +32,20 @@ var Geometry = {
    * x1,y1 / x2,y2: position of segment ends
    */
   squareDistanceToSegment: function(x, y, x1, y1, x2, y2) {
-    var segmentLength = this.squareDistance(x1, y1, x2, y2);
+    let segmentLength = this.squareDistance(x1, y1, x2, y2);
     if(segmentLength == 0)
       return this.squareDistance(x, y, x1 , y1);
 
     // consider the line as parameterized function, find projection param
-    var t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / segmentLength;
+    let t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / segmentLength;
     // clamp to segment
     if(t < 0)
       t = 0;
     else if(t > 1)
       t = 1;
     // compute projected point on line
-    var xp = x1 + t * (x2 - x1);
-    var yp = y1 + t * (y2 - y1);
+    let xp = x1 + t * (x2 - x1);
+    let yp = y1 + t * (y2 - y1);
     // return square distance to projected point
     return this.squareDistance(x, y, xp, yp);
   },
