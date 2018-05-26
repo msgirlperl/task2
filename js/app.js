@@ -21,6 +21,9 @@ let app = {
     this.initDone = true;
   },
 
+  /**
+   * Registers event handlers for toolbar buttons
+   */
   bindToolbarEvents: function () {
 
     document.getElementById('btn-line').addEventListener('click', () => {
@@ -59,6 +62,9 @@ let app = {
     });
   },
 
+  /**
+   * Removes any selected lines and re-draws the canvas
+   */
   unSelectLines: function () {
     if (this.selectedLineIndex > -1){
       this.selectedLineIndex = -1;
@@ -82,6 +88,9 @@ let app = {
     return this.canvasMode === this.modeEnum.MOVE;
   },
 
+  /**
+   * Sets active tab indicator in the toolbar
+   */
   updateToolbarState: function () {
     document.getElementById('btn-erase').className = this.isEraseMode() ? 'active' : '';
     document.getElementById('btn-line').className = this.isDrawMode() ? 'active' : '';
@@ -90,6 +99,9 @@ let app = {
     document.getElementById('btn-move').className = this.isMoveMode() ? 'active' : '';
   },
 
+  /**
+   * Registers event handlers for events on the canvas
+   */
   bindDrawAreaEvents: function () {
     let canvas = document.getElementById('canvas');
     canvas.addEventListener('click', (e) => {
@@ -125,7 +137,7 @@ let app = {
           };
           canvas.addEventListener('mousemove', mouseMoveHandler);
 
-          const mouseUpHandler = (evt) => {
+          const mouseUpHandler = () => {
             this.pos = null;
             canvas.removeEventListener('mousemove', mouseMoveHandler);
             canvas.removeEventListener('mouseup', mouseUpHandler);
@@ -171,8 +183,11 @@ let app = {
     });
   },
 
+  /**
+   * Finds the index in the list of line Arrays that corresponds to the Array with the line closest to (x,y).
+   * If none is found, -1 is returned.
+   */
   findClosestIndex: function(x,y) {
-
     if (this.lines.length > 0) { // if there's something to select
       let minSquareDistance, closestIndex;
       this.lines.forEach((objectLines, index) => {
@@ -189,17 +204,23 @@ let app = {
     return -1;
   },
 
+  /**
+   * Finds the index in the list of line Arrays that corresponds to the Array with the line closest to (x,y).
+   * If it's within 10 pixels of (x,y), its index is stored as the "selectedLineIndex"; if not, "selectedLineIndex" is set to -1
+   */
   selectLine: function(x,y) {
     let closestIndex = this.findClosestIndex(x, y);
     let line = this.lines[closestIndex];
-    //if (line && line.squareDistanceFrom(x,y) <= 100) {// only want lines within 10 pixels
-    if (line && line.some(l => l.squareDistanceFrom(x, y) <= 100 )) {
+    if (line && line.some(l => l.squareDistanceFrom(x, y) <= 100 )) { // only want lines within 10 pixels
       this.selectedLineIndex = closestIndex;
     } else {
       this.selectedLineIndex = -1;
     }
   },
 
+  /**
+   * Removes the line Array closest to (x,y) from the list
+   */
   eraseLine: function(x,y) {
     let closestIndex = this.findClosestIndex(x, y);
     if (closestIndex > -1) {
@@ -207,6 +228,10 @@ let app = {
     }
   },
 
+  /**
+   * If the user hasn't clicked anywhere yet, records the click as the first point.  If a click has
+   * already been recorded, instantiates a line and adds it to the list of line Arrays.
+   */
   drawLine: function(x,y) {
     if(!this.pos) {
       // save first click of the line
@@ -215,13 +240,16 @@ let app = {
       // create the line and add to the list
       let x0 = this.pos[0], y0 = this.pos[1];
       let line = new Line(x0, y0, x, y);
-
       let objectLine = [ line ];
       this.lines.push(objectLine);
       this.pos = null;
     }
   },
 
+  /**
+   * Draws the line Arrays from the list.  If a given line Array is "selected", circle indicators
+   * are added to the ends of those lines.
+   */
   render: function() {
     let canvas = document.getElementById('canvas');
     if (canvas) {

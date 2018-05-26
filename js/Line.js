@@ -34,23 +34,21 @@ Line.prototype.move = function(dx, dy) {
   this.y2 += dy;
 };
 
+Number.prototype.between = function (a, b) {
+  return ((this >= a) && (this <= b));
+}
+
 Line.prototype.checkDisallowMove = function(dx, dy, ctx) {
 
-  // const handleDisallowMove = () => {
-  //   alert('Sorry, you must keep your selection within the drawing area');
-  //   return true;
-  // };
-
-  if (((this.x1 + dx) < 0) || (this.x1 > ctx.width)) return true;
-  if (((this.x2 + dx) < 0) || (this.x2 > ctx.width)) return true;
-  if (((this.y1 + dy) < 0) || (this.y1 > ctx.height)) return true;
-  if (((this.y2 + dy) < 0) || (this.y2 > ctx.height)) return true;
+  if (!(this.x1 + dx).between(0, ctx.width)) return true;
+  if (!(this.x2 + dx).between(0, ctx.width)) return true;
+  if (!(this.y1 + dy).between(0, ctx.height)) return true;
+  if (!(this.y2 + dy).between(0, ctx.height)) return true;
 
   return false;
-
 };
 
 Line.prototype.squareDistanceFrom = function(x, y) {
-  var x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2;
+  let x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2;
   return Geometry.squareDistanceToSegment(x, y, x1, y1, x2, y2);
 };
