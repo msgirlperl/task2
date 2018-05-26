@@ -167,7 +167,6 @@ let app = {
           let warning = document.getElementById('warning');
           warning.className = "visible";
           setTimeout(() =>  warning.className = "hidden", 3000);
-          //mouseUpHandler(); // remove the move handlers b/c we're no longer on the canvas
         } else {
           selectedLines.map(line => line.move(moveX, moveY));
           this.render();
