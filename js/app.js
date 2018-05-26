@@ -117,70 +117,72 @@ let app = {
     });
 
     canvas.addEventListener('mousedown', (e) => {
-
       if (this.isPencilMode() && e.which === 1){
-
-        this.pos = [ e.offsetX, e.offsetY ];
-
-        let objectLines = []; // will hold the lines created while dragging the mouse
-        this.lines.push(objectLines);
-
-          const mouseMoveHandler = (evt) => {
-
-            let newX = evt.offsetX, newY = evt.offsetY;
-            let line = new Line(this.pos[0], this.pos[1], newX, newY);
-
-            objectLines.push(line);
-            this.render();
-
-            this.pos = [ newX, newY ];
-          };
-          canvas.addEventListener('mousemove', mouseMoveHandler);
-
-          const mouseUpHandler = () => {
-            this.pos = null;
-            canvas.removeEventListener('mousemove', mouseMoveHandler);
-            canvas.removeEventListener('mouseup', mouseUpHandler);
-          };
-
-          canvas.addEventListener('mouseup', mouseUpHandler);
+        this.handlePencilModeMouseDown(e);
       } else if (this.isMoveMode() && e.which === 1){
-
-          this.pos = [ e.offsetX, e.offsetY ];
-          this.selectLine(e.offsetX, e.offsetY);
-          if (this.selectedLineIndex > -1){
-
-            const mouseMoveHandler = (evt) => {
-
-              let moveX = evt.offsetX - this.pos[0];
-              let moveY = evt.offsetY - this.pos[1];
-              let selectedLines = this.lines[this.selectedLineIndex];
-              let canvas = document.getElementById('canvas');
-              if (selectedLines.some(line => line.checkDisallowMove(moveX, moveY, canvas))){ // verify we'll still be on the canvas
-                let warning = document.getElementById('warning');
-                warning.className = "visible";
-
-                setTimeout(() =>  warning.className = "hidden", 3000);
-
-                mouseUpHandler(); // remove the move handlers b/c we're no longer on the canvas
-                //evt.stopPropagation();
-              } else {
-                selectedLines.map(line => line.move(moveX, moveY)); //TODO: need return?
-                this.render();
-                this.pos = [ evt.offsetX, evt.offsetY ];
-              }
-            };
-            canvas.addEventListener('mousemove', mouseMoveHandler);
-            const mouseUpHandler = () => {
-              this.pos = null;
-              canvas.removeEventListener('mousemove', mouseMoveHandler);
-              canvas.removeEventListener('mouseup', mouseUpHandler);
-            };
-
-            canvas.addEventListener('mouseup', mouseUpHandler);
-          }
+          this.handleMoveModeMouseDown(e);
       }
     });
+  },
+
+  handlePencilModeMouseDown: function(e) {
+    this.pos = [ e.offsetX, e.offsetY ];
+    let objectLines = []; // will hold the lines created while dragging the mouse
+    this.lines.push(objectLines);
+
+    // creates new Line from last position and adds it to the current line Array, then re-draws the canvas
+    const mouseMoveHandler = (evt) => {
+      let newX = evt.offsetX, newY = evt.offsetY;
+      let line = new Line(this.pos[0], this.pos[1], newX, newY);
+      objectLines.push(line);
+      this.render();
+      this.pos = [ newX, newY ];
+    };
+    canvas.addEventListener('mousemove', mouseMoveHandler);
+
+    // ends the drawing by un-registering the mousemove handler (and then unregisters itself)
+    const mouseUpHandler = () => {
+      this.pos = null;
+      canvas.removeEventListener('mousemove', mouseMoveHandler);
+      canvas.removeEventListener('mouseup', mouseUpHandler);
+    };
+    canvas.addEventListener('mouseup', mouseUpHandler);
+  },
+
+  handleMoveModeMouseDown: function(e) {
+    this.pos = [ e.offsetX, e.offsetY ];
+    this.selectLine(e.offsetX, e.offsetY);
+    if (this.selectedLineIndex > -1){
+      /**
+       *  Calculates how far the line Array (the drawn object) is projected to move and determines if it will remain within the canvas.
+       *  If so, moves the Array, and re-draws the canvas.
+       *  If not, it briefly shows a warning in the toolbar and removes the handlers to re-set the move.
+       */
+      const mouseMoveHandler = (evt) => {
+        let moveX = evt.offsetX - this.pos[0];
+        let moveY = evt.offsetY - this.pos[1];
+        let selectedLines = this.lines[this.selectedLineIndex];
+        let canvas = document.getElementById('canvas');
+        if (selectedLines.some(line => line.checkDisallowMove(moveX, moveY, canvas))){ // verify we'll still be on the canvas
+          let warning = document.getElementById('warning');
+          warning.className = "visible";
+          setTimeout(() =>  warning.className = "hidden", 3000);
+          //mouseUpHandler(); // remove the move handlers b/c we're no longer on the canvas
+        } else {
+          selectedLines.map(line => line.move(moveX, moveY));
+          this.render();
+          this.pos = [ evt.offsetX, evt.offsetY ];
+        }
+      };
+      canvas.addEventListener('mousemove', mouseMoveHandler);
+      // ends the move by un-registering the mousemove handler (and then unregisters itself)
+      const mouseUpHandler = () => {
+        this.pos = null;
+        canvas.removeEventListener('mousemove', mouseMoveHandler);
+        canvas.removeEventListener('mouseup', mouseUpHandler);
+      };
+      canvas.addEventListener('mouseup', mouseUpHandler);
+    }
   },
 
   /**
