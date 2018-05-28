@@ -1,5 +1,10 @@
-let app = {
+Number.prototype.between = function (a, b) {
+  return ((this >= a) && (this <= b));
+};
+
+({
   initDone: false,
+  canvas: null,
   lines: [],
   pos: null,
   modeEnum: {
@@ -15,6 +20,7 @@ let app = {
   init: function () {
     if(this.initDone)
       return;
+    this.canvas = document.getElementById('canvas');
     this.canvasMode = this.modeEnum.DRAW;
     this.bindToolbarEvents();
     this.bindDrawAreaEvents();
@@ -25,7 +31,6 @@ let app = {
    * Registers event handlers for toolbar buttons
    */
   bindToolbarEvents: function () {
-
     document.getElementById('btn-line').addEventListener('click', () => {
       this.canvasMode = this.modeEnum.DRAW;
       this.unSelectLines();
@@ -103,8 +108,7 @@ let app = {
    * Registers event handlers for events on the canvas
    */
   bindDrawAreaEvents: function () {
-    let canvas = document.getElementById('canvas');
-    canvas.addEventListener('click', (e) => {
+    this.canvas.addEventListener('click', (e) => {
       let x = e.offsetX, y = e.offsetY;
       if (this.isEraseMode()) {
         this.eraseLine(x,y);
@@ -133,10 +137,13 @@ let app = {
     // creates new Line from last position and adds it to the current line Array, then re-draws the canvas
     const mouseMoveHandler = (evt) => {
       let newX = evt.offsetX, newY = evt.offsetY;
-      let line = new Line(this.pos[0], this.pos[1], newX, newY);
-      objectLines.push(line);
-      this.render();
-      this.pos = [ newX, newY ];
+      // verify the mouse didn't leave the canvas
+      if (newX.between(0, this.canvas.width) && newY.between(0, this.canvas.height)) {
+        let line = new Line(this.pos[0], this.pos[1], newX, newY);
+        objectLines.push(line);
+        this.render();
+        this.pos = [ newX, newY ];
+      }
     };
     canvas.addEventListener('mousemove', mouseMoveHandler);
 
@@ -144,9 +151,9 @@ let app = {
     const mouseUpHandler = () => {
       this.pos = null;
       canvas.removeEventListener('mousemove', mouseMoveHandler);
-      canvas.removeEventListener('mouseup', mouseUpHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
     };
-    canvas.addEventListener('mouseup', mouseUpHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
   },
 
   handleMoveModeMouseDown: function(e) {
@@ -162,7 +169,6 @@ let app = {
         let moveX = evt.offsetX - this.pos[0];
         let moveY = evt.offsetY - this.pos[1];
         let selectedLines = this.lines[this.selectedLineIndex];
-        let canvas = document.getElementById('canvas');
         if (selectedLines.some(line => line.checkDisallowMove(moveX, moveY, canvas))){ // verify we'll still be on the canvas
           let warning = document.getElementById('warning');
           warning.className = "visible";
@@ -178,9 +184,9 @@ let app = {
       const mouseUpHandler = () => {
         this.pos = null;
         canvas.removeEventListener('mousemove', mouseMoveHandler);
-        canvas.removeEventListener('mouseup', mouseUpHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
       };
-      canvas.addEventListener('mouseup', mouseUpHandler);
+      document.addEventListener('mouseup', mouseUpHandler);
     }
   },
 
@@ -193,7 +199,7 @@ let app = {
       let minSquareDistance, closestIndex;
       this.lines.forEach((objectLines, index) => {
         objectLines.forEach((line) => {
-          let squareDistance = line.squareDistanceFrom(x, y);
+          let squareDistance = line.squareDistanceFrom(x, y); // don't need to know the actual distance so let's use the square as a short-cut
           if((minSquareDistance === undefined) || (squareDistance < minSquareDistance)) {
             minSquareDistance = squareDistance;
             closestIndex = index;
@@ -212,7 +218,7 @@ let app = {
   selectLine: function(x,y) {
     let closestIndex = this.findClosestIndex(x, y);
     let line = this.lines[closestIndex];
-    if (line && line.some(l => l.squareDistanceFrom(x, y) <= 100 )) { // only want lines within 10 pixels
+    if ((line !== undefined) && line.some(l => l.squareDistanceFrom(x, y) <= 100 )) { // only want lines within 10 pixels
       this.selectedLineIndex = closestIndex;
     } else {
       this.selectedLineIndex = -1;
@@ -252,8 +258,7 @@ let app = {
    * are added to the ends of those lines.
    */
   render: function() {
-    let canvas = document.getElementById('canvas');
-    if (canvas) {
+    if (this.canvas) {
       let ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       this.lines.forEach((objectLines, index) => {
@@ -266,5 +271,4 @@ let app = {
       });
     }
   },
-};
-app.init();
+}).init();
