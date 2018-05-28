@@ -44,8 +44,8 @@ var Geometry = {
     else if(t > 1)
       t = 1;
     // compute projected point on line
-    let xp = x1 + t * (x2 - x1);
-    let yp = y1 + t * (y2 - y1);
+    let xp = x1 + (t * (x2 - x1));
+    let yp = y1 + (t * (y2 - y1));
     // return square distance to projected point
     return this.squareDistance(x, y, xp, yp);
   },

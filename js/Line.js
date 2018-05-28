@@ -3,7 +3,7 @@ var Line = function(x1, y1, x2, y2) {
   this.y1 = y1;
   this.x2 = x2;
   this.y2 = y2;
-  this.length = Geometry.distance(x1, y1, x2, y2);
+//  this.length = Geometry.distance(x1, y1, x2, y2);
 };
 
 Line.prototype.draw = function(ctx) {
@@ -33,10 +33,6 @@ Line.prototype.move = function(dx, dy) {
   this.x2 += dx;
   this.y2 += dy;
 };
-
-Number.prototype.between = function (a, b) {
-  return ((this >= a) && (this <= b));
-}
 
 Line.prototype.checkDisallowMove = function(dx, dy, ctx) {
 
